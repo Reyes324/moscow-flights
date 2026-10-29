@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>广深港飞莫斯科最低价</title>
+<meta name="description" content="广州、深圳、香港往返莫斯科/圣彼得堡，2026年11月至2027年4月含托运最低价，实时核价，分国内卡能付和需俄罗斯付款两组。">
+<meta property="og:title" content="广深港飞莫斯科最低价">
+<meta property="og:description" content="广州、深圳、香港往返莫斯科/圣彼得堡，2026年11月至2027年4月含托运最低价，实时核价，分国内卡能付和需俄罗斯付款两组。">
+<meta name="theme-color" content="#18222d">
+
+<style>
+/* Layout: departure-board header, then one reading column; the fare table is the spine, month grid second. */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#15202c; --muted:#5b6876; --line:#d9dfe6;
+  --signal:#c9821c; --signal-soft:#fbf0dc; --board:#18222d; --board-ink:#f4e9cf;
+  --ok:#2f7d4f; --ok-soft:#e3f1e8; --warn:#a4621a; --warn-soft:#f8ebda; --bad:#b03a32; --bad-soft:#f7e2df;
+  --heat-0:#e5eef4; --heat-1:#c9dbe8; --heat-2:#9fbfd6; --heat-3:#6f9cbd; --heat-4:#41769c;
+  --heat-ink-dark:#ffffff;
+  --f-display:"PingFang SC","Hiragino Sans GB","Noto Sans SC",system-ui,sans-serif;
+  --f-body:"PingFang SC","Hiragino Sans GB","Noto Sans SC",system-ui,sans-serif;
+  --f-code:ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f151c; --surface:#161e27; --ink:#e4e9ef; --muted:#93a1b0; --line:#28323e;
+  --signal:#e5a54a; --signal-soft:#2e2414; --board:#0a0f14; --board-ink:#f1dfb4;
+  --ok:#6cc08d; --ok-soft:#16281d; --warn:#e0a35a; --warn-soft:#2c2114; --bad:#e57b72; --bad-soft:#2e1816;
+  --heat-0:#1b2833; --heat-1:#213a4e; --heat-2:#2b5372; --heat-3:#3a6f96; --heat-4:#5a93bd;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f151c; --surface:#161e27; --ink:#e4e9ef; --muted:#93a1b0; --line:#28323e;
+  --signal:#e5a54a; --signal-soft:#2e2414; --board:#0a0f14; --board-ink:#f1dfb4;
+  --ok:#6cc08d; --ok-soft:#16281d; --warn:#e0a35a; --warn-soft:#2c2114; --bad:#e57b72; --bad-soft:#2e1816;
+  --heat-0:#1b2833; --heat-1:#213a4e; --heat-2:#2b5372; --heat-3:#3a6f96; --heat-4:#5a93bd;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+img{max-width:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px;display:flex;flex-direction:column;gap:40px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.25}
+h2{font-size:1.3rem}
+h3{font-size:1.02rem}
+p{margin:0}
+.code{font-family:var(--f-code);font-size:.86em;letter-spacing:.02em}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.label{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-family:var(--f-code)}
+
+/* board */
+.board{background:var(--board);color:var(--board-ink);border-radius:6px;padding:22px 22px 20px;display:flex;flex-direction:column;gap:18px}
+.board .route{font-family:var(--f-code);font-size:.8rem;letter-spacing:.12em;opacity:.8}
+.board h1{font-size:clamp(1.45rem,4vw,2rem);color:var(--board-ink)}
+.board .sub{opacity:.78;font-size:.92rem}
+.flaps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.flap{border-top:1px solid color-mix(in srgb,var(--board-ink) 25%,transparent);padding-top:12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.flap .k{font-family:var(--f-code);font-size:.7rem;letter-spacing:.1em;opacity:.7}
+.flap .v{font-family:var(--f-display);font-weight:700;font-size:1.7rem;color:var(--signal);font-variant-numeric:tabular-nums}
+.flap .d{font-size:.84rem;opacity:.85}
+
+/* findings */
+.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 28px;margin:0;padding:0;list-style:none}
+.findings li{display:flex;gap:10px;min-width:0}
+.findings b{font-family:var(--f-code);color:var(--signal);font-weight:600;flex:none}
+
+/* fare table */
+.scroller{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-code);font-size:.7rem;letter-spacing:.08em;color:var(--muted);font-weight:400;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.price{font-family:var(--f-display);font-weight:700;font-size:1.05rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.price small{display:block;font-family:var(--f-body);font-weight:400;font-size:.76rem;color:var(--muted)}
+.rank{font-family:var(--f-code);color:var(--muted)}
+tr.top td{background:var(--signal-soft)}
+.legs{display:flex;flex-direction:column;gap:2px;font-size:.88rem}
+.legs .code{color:var(--ink)}
+.chip{display:inline-block;font-size:.74rem;padding:2px 8px;border-radius:999px;white-space:nowrap;line-height:1.5}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.one{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.links{display:flex;gap:10px;flex-wrap:wrap;font-size:.8rem}
+a{color:var(--signal);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+
+/* heat grid */
+.grid{display:grid;grid-template-columns:118px repeat(6,minmax(64px,1fr));gap:4px;min-width:560px}
+.grid .h{font-family:var(--f-code);font-size:.72rem;color:var(--muted);padding:4px 2px;text-align:center}
+.grid .r{font-family:var(--f-code);font-size:.78rem;padding:10px 4px;display:flex;align-items:center}
+.cell{border-radius:4px;padding:10px 4px;text-align:center;font-variant-numeric:tabular-nums;font-size:.88rem;font-weight:500}
+.cell small{display:block;font-size:.66rem;font-weight:400;opacity:.8}
+.c0{background:var(--heat-0);color:var(--ink)} .c1{background:var(--heat-1);color:var(--ink)} .c2{background:var(--heat-2);color:var(--ink)}
+.c3{background:var(--heat-3);color:var(--heat-ink-dark)} .c4{background:var(--heat-4);color:var(--heat-ink-dark)}
+.legend{display:flex;gap:6px;align-items:center;font-size:.78rem;color:var(--muted);flex-wrap:wrap}
+.legend span.sw{width:22px;height:12px;border-radius:2px;display:inline-block}
+
+section{display:flex;flex-direction:column;gap:14px}
+.note{border-left:3px solid var(--signal);padding:4px 0 4px 14px;font-size:.92rem}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.cols > div{display:flex;flex-direction:column;gap:8px;min-width:0}
+ul.plain{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
+.review{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:12px}
+footer{font-size:.82rem;color:var(--muted)}
+
+/* phone: tables become cards, month grid becomes per-route blocks */
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{gap:32px;padding-block:16px 48px}
+  .board{padding:18px 16px}
+  .flap .v{font-size:1.5rem}
+  .scroller{overflow:visible;border:0;background:none}
+  table{min-width:0;display:block}
+  thead{display:none}
+  tbody{display:flex;flex-direction:column;gap:10px}
+  tr{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"rank price chip" "trip trip trip" "flt flt flt" "link link link";gap:6px 10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+  tr.top{border-color:var(--signal)}
+  tr.top td{background:none}
+  td{border:0;padding:0}
+  td:nth-child(1){grid-area:rank;align-self:center}
+  td:nth-child(2){grid-area:price;font-size:1.25rem}
+  td:nth-child(3){grid-area:trip}
+  td:nth-child(4){grid-area:flt;border-top:1px dashed var(--line);padding-top:6px}
+  td:nth-child(5){grid-area:chip;align-self:start}
+  td:nth-child(6){grid-area:link}
+  td.price small{display:inline;margin-left:6px}
+  .links a{display:inline-block;padding:4px 0;font-size:.9rem}
+  .grid-box{padding:0!important;border:0!important;background:none!important}
+  .grid{grid-template-columns:repeat(3,1fr);min-width:0;gap:6px}
+  .grid .h{display:none}
+  .grid .r{grid-column:1/-1;padding:10px 0 0;font-size:.85rem;font-weight:600}
+  .cell .m{display:block}
+}
+.cell .m{display:none;font-size:.66rem;opacity:.8;font-weight:400}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+<header class="board">
+  <div class="route">CAN · SZX · HKG &nbsp;⇄&nbsp; MOW · LED</div>
+  <h1>未来半年最便宜的往返机票</h1>
+  <p class="sub">2026-11 至 2027-04 出发，停留 8～16 天，1 位成人，含 1 件托运，每张票最多转 2 次。价格为人民币含税总价，2026-10-29 晚实时查询。</p>
+  <div class="flaps">
+    <div class="flap"><span class="k">国内卡能付 · 最低</span><span class="v">¥3,586</span><span class="d">香港往返莫斯科 2/27–3/7，国航经北京，Trip.com</span></div>
+    <div class="flap"><span class="k">国内卡能付 · 广州出发</span><span class="v">¥3,727</span><span class="d">12/30–1/13，川航经成都，Trip.com</span></div>
+    <div class="flap"><span class="k">要用俄罗斯付款方式</span><span class="v">¥2,156</span><span class="d">广州往返 12/28–1/12，南航转 2 次；用银联同日期最低 ¥3,921</span></div>
+  </div>
+</header>
+
+<section>
+  <h2>结论</h2>
+  <ul class="findings">
+    <li><b>01</b><span><strong>先看能不能付款。</strong>Aviasales 上最便宜的票（¥2,156 起）卖家是俄罗斯代理，只收俄罗斯银行卡或 SBP（俄罗斯快速支付），用银联最低要 ¥3,921。用国内卡买，Trip.com 的价格才是真实可买价。</span></li>
+    <li><b>02</b><span><strong>香港出发一张票最便宜。</strong>国航经北京往返 ¥3,586（2/27–3/7）或 ¥3,642（12/31–1/9），一张票买到底。</span></li>
+    <li><b>03</b><span><strong>12 月下旬去、1 月 9 日以后回。</strong>从中国去莫斯科的票 12/21–12/31 最便宜，从莫斯科回中国的票 12/24–1/3 最贵，回程要避开新年。</span></li>
+    <li><b>04</b><span><strong>莫斯科比圣彼得堡便宜。</strong>圣彼得堡没有直飞，同条件实时价普遍高 ¥800 以上；12/2 广州飞圣彼得堡单程最多转 2 次的最低价也要 ¥2,971。</span></li>
+  </ul>
+</section>
+
+<section>
+  <h2>A 组：国内卡能付（Trip.com 实时价）</h2>
+  <p class="muted">Trip.com 只卖最多转 1 次的方案，用银联、支付宝等国内方式付款。"双渠道"表示 Aviasales 同日期也查到相近价格。</p>
+  <div class="scroller">
+  <table>
+    <thead><tr><th>#</th><th>总价</th><th>行程</th><th>航班</th><th>核实</th><th>去哪查</th></tr></thead>
+    <tbody>
+      <tr class="top"><td class="rank">1</td><td class="price">¥3,586<small>Aviasales 3,714</small></td>
+        <td><div class="legs"><span><span class="code">HKG⇄SVO</span> 2/27–3/7</span><span class="muted">一张往返票 · 8 天</span></div></td>
+        <td><div class="legs"><span>国航，去回都经北京转 1 次</span><span>去 08:30 起飞，约 14h</span></div></td>
+        <td><span class="chip ok">双渠道</span></td>
+        <td><div class="links"><a href="https://www.trip.com/flights/showfarefirst?dcity=hkg&acity=mow&ddate=2027-02-27&rdate=2027-03-07&triptype=rt&class=y&quantity=1&curr=CNY" target="_blank" rel="noopener">Trip.com</a></div></td></tr>
+      <tr><td class="rank">2</td><td class="price">¥3,642<small>Aviasales 3,662</small></td>
+        <td><div class="legs"><span><span class="code">HKG⇄SVO</span> 12/31–1/9</span><span class="muted">一张往返票 · 9 天</span></div></td>
+        <td><div class="legs"><span>国航，去回都经北京转 1 次</span><span>去 08:30–17:40；回 17:25–次日 13:05</span></div></td>
+        <td><span class="chip ok">双渠道</span></td>
+        <td><div class="links"><a href="https://www.trip.com/flights/showfarefirst?dcity=hkg&acity=mow&ddate=2026-12-31&rdate=2027-01-09&triptype=rt&class=y&quantity=1&curr=CNY" target="_blank" rel="noopener">Trip.com</a></div></td></tr>
+      <tr><td class="rank">3</td><td class="price">¥3,727<small>Aviasales 3,739</small></td>
+        <td><div class="legs"><span><span class="code">CAN⇄MOW</span> 12/30–1/13</span><span class="muted">一张往返票 · 14 天</span></div></td>
+        <td><div class="legs"><span>川航，经成都转 1 次</span><span>同日期直飞往返 ¥5,163</span></div></td>
+        <td><span class="chip ok">双渠道</span></td>
+        <td><div class="links"><a href="https://www.trip.com/flights/showfarefirst?dcity=can&acity=mow&ddate=2026-12-30&rdate=2027-01-13&triptype=rt&class=y&quantity=1&curr=CNY" target="_blank" rel="noopener">Trip.com</a></div></td></tr>
+      <tr><td class="rank">4</td><td class="price">¥3,786</td>
+        <td><div class="legs"><span><span class="code">CAN⇄MOW</span> 12/29–1/8</span><span class="muted">一张往返票 · 10 天</span></div></td>
+        <td><div class="legs"><span>转 1 次</span><span>南航直飞往返 ¥4,898</span></div></td>
+        <td><span class="chip one">单渠道</span></td>
+        <td><div class="links"><a href="https://www.trip.com/flights/showfarefirst?dcity=can&acity=mow&ddate=2026-12-29&rdate=2027-01-08&triptype=rt&class=y&quantity=1&curr=CNY" target="_blank" rel="noopener">Trip.com</a></div></td></tr>
+      <tr><td class="rank">5</td><td class="price">¥3,791</td>
+        <td><div class="legs"><span><span class="code">CAN⇄MOW</span> 12/27–1/9</span><span class="muted">一张往返票 · 13 天</span></div></td>
+        <td><div class="legs"><span>川航，经成都转 1 次</span><span>俄航直飞往返 ¥5,170</span></div></td>
+        <td><span class="chip one">单渠道</span></td>
+        <td><div class="links"><a href="https://www.trip.com/flights/showfarefirst?dcity=can&acity=mow&ddate=2026-12-27&rdate=2027-01-09&triptype=rt&class=y&quantity=1&curr=CNY" target="_blank" rel="noopener">Trip.com</a></div></td></tr>
+      <tr><td class="rank">6</td><td class="price">¥3,810<small>1,601 + 2,209</small></td>
+        <td><div class="legs"><span><span class="code">CAN→SVO</span> 12/30</span><span><span class="code">MOW→CAN</span> 1/13 · 14 天</span><span class="muted">两张单程</span></div></td>
+        <td><div class="legs"><span>去：俄航直飞 11:50–17:15</span><span>回：转 1 次</span></div></td>
+        <td><span class="chip ok">去程双渠道</span></td>
+        <td><div class="links"><a href="https://www.trip.com/flights/showfarefirst?dcity=can&acity=mow&ddate=2026-12-30&triptype=ow&class=y&quantity=1&curr=CNY" target="_blank" rel="noopener">去程</a><a href="https://www.trip.com/flights/showfarefirst?dcity=mow&acity=can&ddate=2027-01-13&triptype=ow&class=y&quantity=1&curr=CNY" target="_blank" rel="noopener">回程</a></div></td></tr>
+      <tr><td class="rank">7</td><td class="price">¥3,814<small>Aviasales 3,921</small></td>
+        <td><div class="legs"><span><span class="code">CAN⇄MOW</span> 2/20–3/4</span><span class="muted">一张往返票 · 12 天</span></div></td>
+        <td><div class="legs"><span>东航转 1 次</span><span>直飞往返 ¥4,954</span></div></td>
+        <td><span class="chip ok">双渠道</span></td>
+        <td><div class="links"><a href="https://www.trip.com/flights/showfarefirst?dcity=can&acity=mow&ddate=2027-02-20&rdate=2027-03-04&triptype=rt&class=y&quantity=1&curr=CNY" target="_blank" rel="noopener">Trip.com</a></div></td></tr>
+      <tr><td class="rank">8</td><td class="price">¥4,009<small>1,800 + 2,209</small></td>
+        <td><div class="legs"><span><span class="code">SZX→SVO</span> 12/31</span><span><span class="code">MOW→CAN</span> 1/13 · 13 天</span><span class="muted">两张单程，深圳去广州回</span></div></td>
+        <td><div class="legs"><span>去：川航经成都，停 17.5h，全程 28h</span><span>回：转 1 次</span></div></td>
+        <td><span class="chip ok">去程双渠道</span></td>
+        <td><div class="links"><a href="https://www.trip.com/flights/showfarefirst?dcity=szx&acity=mow&ddate=2026-12-31&triptype=ow&class=y&quantity=1&curr=CNY" target="_blank" rel="noopener">去程</a></div></td></tr>
+      <tr><td class="rank">9</td><td class="price">¥4,116<small>1,601 + 2,515</small></td>
+        <td><div class="legs"><span><span class="code">CAN→SVO</span> 12/30</span><span><span class="code">SVO→CAN</span> 1/13 · 14 天</span><span class="muted">两张单程，全程直飞</span></div></td>
+        <td><div class="legs"><span>去：俄航直飞 11:50</span><span>回：南航直飞 14:50–次日 05:10</span></div></td>
+        <td><span class="chip one">单渠道</span></td>
+        <td><div class="links"><a href="https://www.trip.com/flights/showfarefirst?dcity=mow&acity=can&ddate=2027-01-13&triptype=ow&class=y&quantity=1&curr=CNY" target="_blank" rel="noopener">回程</a></div></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>B 组：更便宜，但要用俄罗斯付款方式</h2>
+  <p class="muted">这些价格只在 Aviasales 查到，卖家多为俄罗斯代理。付款方式面板显示最低价只能用俄罗斯银行卡或 SBP；有俄罗斯卡或朋友代付才考虑。转 2 次的南航方案 Trip.com 不卖。</p>
+  <div class="scroller">
+  <table>
+    <thead><tr><th>#</th><th>总价</th><th>行程</th><th>航班</th><th>付款</th><th>去哪查</th></tr></thead>
+    <tbody>
+      <tr><td class="rank">B1</td><td class="price">¥2,156<small>银联最低 3,921</small></td>
+        <td><div class="legs"><span><span class="code">CAN⇄SVO</span> 12/28–1/12</span><span class="muted">一张往返票 · 15 天</span></div></td>
+        <td><div class="legs"><span>全程南航，各转 2 次，含 20kg</span><span>去：重庆过夜停 18h50m，再经乌鲁木齐，全程 29h</span><span>回：经乌鲁木齐、郑州，17h10m</span><span class="muted">卖家 Aviakassa；不过夜的方案 ¥2,596 起</span></div></td>
+        <td><span class="chip bad">俄卡/SBP</span></td>
+        <td><div class="links"><a href="https://www.aviasales.ru/search/CAN2812MOW12011" target="_blank" rel="noopener">Aviasales</a></div></td></tr>
+      <tr><td class="rank">B2</td><td class="price">¥2,254<small>银联最低 3,921</small></td>
+        <td><div class="legs"><span><span class="code">CAN⇄SVO</span> 12/24–1/8</span><span class="muted">一张往返票 · 15 天</span></div></td>
+        <td><div class="legs"><span>全程南航，各转 2 次，含 20kg</span><span>去经重庆、乌鲁木齐 27h45m；回经乌鲁木齐、西安 16h40m</span></div></td>
+        <td><span class="chip bad">俄卡/SBP</span></td>
+        <td><div class="links"><a href="https://www.aviasales.ru/search/CAN2412MOW08011" target="_blank" rel="noopener">Aviasales</a></div></td></tr>
+      <tr><td class="rank">B3</td><td class="price">¥2,728</td>
+        <td><div class="legs"><span><span class="code">CAN⇄SVO</span> 12/29–1/8</span><span class="muted">一张往返票 · 10 天</span></div></td>
+        <td><div class="legs"><span>去：直飞 11:50</span><span>回：经乌鲁木齐、西安转 2 次</span></div></td>
+        <td><span class="chip one">未确认</span></td>
+        <td><div class="links"><a href="https://www.aviasales.ru/search/CAN2912MOW08011" target="_blank" rel="noopener">Aviasales</a></div></td></tr>
+      <tr><td class="rank">B4</td><td class="price">¥3,461<small>1,581 + 1,880</small></td>
+        <td><div class="legs"><span><span class="code">CAN→SVO</span> 12/30</span><span><span class="code">DME→CAN</span> 1/13</span><span class="muted">两张单程</span></div></td>
+        <td><div class="legs"><span>去：俄航直飞（Trip.com 同航班 ¥1,601）</span><span>回：经新西伯利亚转 1 次，全程 25h</span></div></td>
+        <td><span class="chip one">未确认</span></td>
+        <td><div class="links"><a href="https://www.aviasales.ru/search/MOW1301CAN1" target="_blank" rel="noopener">回程</a></div></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>每个月大概多少钱</h2>
+  <p class="muted">每格是该月出发、停留 8～16 天的最低估算价，用"去程单程＋回程单程"的缓存价相加，<strong>不是实时价</strong>，也不保证转机次数。单程缓存与实时价一般只差 1～3%，适合看哪个月便宜。圣彼得堡的格子偏乐观：便宜的单程常要转 3 次，实时按最多转 2 次查会贵不少。</p>
+  <div class="scroller grid-box" style="padding:12px">
+    <div class="grid" id="grid"></div>
+  </div>
+  <div class="legend"><span>便宜</span><span class="sw c0"></span><span class="sw c1"></span><span class="sw c2"></span><span class="sw c3"></span><span class="sw c4"></span><span>贵</span><span>· 格子下方是对应的最便宜出发/回程日期</span></div>
+</section>
+
+<section>
+  <h2>怎么查的</h2>
+  <div class="cols">
+    <div>
+      <h3>三步</h3>
+      <ul class="plain">
+        <li><strong>粗扫：</strong>用 Aviasales 的价格日历接口，拉 12 个方向、181 天每天的单程最低价（含行李），以及缓存里所有 8～16 天的往返价。</li>
+        <li><strong>实时核价：</strong>挑出约 40 个候选日期，在 Aviasales 实时搜索，读出含托运、≤2 次转机的最低票；前几名再到 Trip.com 按同样日期重查。</li>
+        <li><strong>独立复查：</strong>把数据和结论交给 Codex，让它自己重拉数据、找更便宜的方案、挑错。</li>
+      </ul>
+    </div>
+    <div>
+      <h3>要知道的局限</h3>
+      <ul class="plain">
+        <li>缓存只能当线索：往返缓存有时偏低一半（广州 11/25–12/8 缓存 ¥2,218，实时 ¥5,275），有时又偏高（12/24–1/8 缓存 ¥2,632，实时 ¥2,254）。单程缓存多数差 1～3%，个别差 14%。</li>
+        <li>两张单程是两张独立的票，去程出问题不保回程。</li>
+        <li>Aviasales 读价时，筛选条件会从上一次搜索带过来；页面若提示"已放宽部分筛选"，读出的价格可能不满足条件。B 组每条都打开详情核对过航段。</li>
+        <li>没覆盖：携程国内站、航司官网、会员价和 App 专享价。</li>
+        <li>低价舱位余票少，价格随时会变，下单当天要重查。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Codex 复查</h2>
+  <div class="review" id="review">
+    <p>Codex（另一家公司的 AI）拿到我的数据和结论后，自己用接口重拉了 37 组数据，再找更便宜的方案、挑错。它的数据和我的单程缓存 97% 一致。</p>
+    <ul class="plain">
+      <li><strong>它找到了更便宜的：</strong>指出广州往返 12/24–1/8 等日期缓存只要 ¥2,600 左右。我实时核价后确认了 ¥2,156 和 ¥2,254 两张票（B1、B2），原来的第 1 名 ¥3,461 被超过。继续追查才发现这些票只能用俄罗斯付款方式，于是分成了 A、B 两组。</li>
+      <li><strong>它指出的错：</strong>排名顺序排错一处；"单程缓存只差 1～3%"说得太满；"覆盖 180 天"实为 181 天；"俄航"当时只是推测。前三处已改，俄航已在 Trip.com 结果里看到航司名，确认是俄航。</li>
+      <li><strong>它提出、但我核价后否定的：</strong>广州去、圣彼得堡回的拼法缓存 ¥3,620，实时查发现低价那张要转 3 次，不符合条件；最多转 2 次的去程就要 ¥2,971。</li>
+      <li><strong>它说不能证明的：</strong>"未来半年绝对最低"无法证明，只能说在查过的渠道和日期里最低。这句我同意。</li>
+    </ul>
+  </div>
+</section>
+
+<footer>数据来源：Aviasales（tickets-api.aviasales.ru 价格日历和实时搜索）、Trip.com 实时搜索。查询时间 2026-10-29 22:30–23:20（北京时间）。只查价，未下单。</footer>
+</div>
+
+<script>
+const grid={"CAN-MOW":{"2026-11":[3863,"2026-11-16","2026-12-01"],"2026-12":[3395,"2026-12-30","2027-01-13"],"2027-01":[4200,"2027-01-03","2027-01-13"],"2027-02":[4464,"2027-02-25","2027-03-09"],"2027-03":[4362,"2027-03-25","2027-04-07"],"2027-04":[3841,"2027-04-29","2027-05-13"]},
+"SZX-MOW":{"2026-11":[3786,"2026-11-26","2026-12-08"],"2026-12":[3948,"2026-12-31","2027-01-12"],"2027-01":[4431,"2027-01-03","2027-01-13"],"2027-02":[4471,"2027-02-21","2027-03-04"],"2027-03":[4790,"2027-03-11","2027-03-24"],"2027-04":[4670,"2027-04-29","2027-05-06"]},
+"HKG-MOW":{"2026-11":[3747,"2026-11-24","2026-12-06"],"2026-12":[4017,"2026-12-28","2027-01-08"],"2027-01":[4019,"2027-01-01","2027-01-13"],"2027-02":[4294,"2027-02-27","2027-03-07"],"2027-03":[4295,"2027-03-01","2027-03-11"],"2027-04":[4737,"2027-04-11","2027-04-22"]},
+"CAN-LED":{"2026-11":[3718,"2026-11-18","2026-11-28"],"2026-12":[3604,"2026-12-02","2026-12-12"],"2027-01":[4191,"2027-01-02","2027-01-18"],"2027-02":[5515,"2027-02-10","2027-02-25"],"2027-03":[5472,"2027-03-03","2027-03-17"],"2027-04":[5535,"2027-04-03","2027-04-19"]},
+"SZX-LED":{"2026-11":[4442,"2026-11-24","2026-12-02"],"2026-12":[4543,"2026-12-21","2027-01-02"],"2027-01":[5576,"2027-01-26","2027-02-07"],"2027-02":[5567,"2027-02-23","2027-03-07"],"2027-03":[5852,"2027-03-19","2027-03-31"],"2027-04":[5776,"2027-04-25","2027-05-09"]},
+"HKG-LED":{"2026-11":[5062,"2026-11-24","2026-12-05"],"2026-12":[5220,"2026-12-21","2027-01-02"],"2027-01":[5198,"2027-01-01","2027-01-13"],"2027-02":[5459,"2027-02-26","2027-03-11"],"2027-03":[5460,"2027-03-21","2027-04-01"],"2027-04":[6062,"2027-04-28","2027-05-10"]}};
+const names={"CAN-MOW":"广州⇄莫斯科","SZX-MOW":"深圳⇄莫斯科","HKG-MOW":"香港⇄莫斯科","CAN-LED":"广州⇄圣彼得堡","SZX-LED":"深圳⇄圣彼得堡","HKG-LED":"香港⇄圣彼得堡"};
+const months=["2026-11","2026-12","2027-01","2027-02","2027-03","2027-04"];
+const mlabel=m=>(+m.slice(5))+"月";
+const all=Object.values(grid).flatMap(r=>Object.values(r).map(x=>x[0]));
+const lo=Math.min(...all),hi=Math.max(...all);
+const cls=v=>"c"+Math.min(4,Math.floor((v-lo)/(hi-lo+1)*5));
+const md=s=>(+s.slice(5,7))+"/"+(+s.slice(8));
+const g=document.getElementById("grid");
+let h='<div class="h"></div>'+months.map(m=>`<div class="h">${mlabel(m)}出发</div>`).join("");
+for(const k in grid){h+=`<div class="r">${names[k]}</div>`;for(const m of months){const x=grid[k][m];h+=x?`<div class="cell ${cls(x[0])}"><span class="m">${mlabel(m)}出发</span>¥${x[0].toLocaleString()}<small>${md(x[1])}–${md(x[2])}</small></div>`:'<div class="cell c0">—</div>'}}
+g.innerHTML=h;
+</script>
+
+</body>
+</html>
